@@ -2,6 +2,7 @@ package tokens
 
 import (
 	"errors"
+	"fmt"
 	"math/big"
 	"math/rand"
 	"reflect"
@@ -11,6 +12,12 @@ import (
 // ErrUnsupportedTokenPair is returned when the given token pair is not
 // supported.
 var ErrUnsupportedTokenPair = errors.New("unsupported token pair")
+
+// NewErrUnsupportedToken returns an error when the given token is not
+// supported by Ren.
+func NewErrUnsupportedToken(token Name) error {
+	return fmt.Errorf("unsupported token: %s", token)
+}
 
 // Name is a string representation of a token.
 type Name string
