@@ -8,10 +8,10 @@ import (
 // ErrInvalidTokenPair is returned when the given token pair is invalid.
 var ErrInvalidTokenPair = errors.New("invalid token pair")
 
-// Pair are a numerical representation of the token pairings supported by Ren.
+// Pair is a numerical representation for a token pairing.
 type Pair uint64
 
-// NewPair creates a new pair with two given Tokens.
+// NewPair creates a new pair from the given tokens.
 func NewPair(send, receive Token) Pair {
 	if send.Code < receive.Code {
 		return Pair((uint64(send.Code) << 32) | uint64(receive.Code))
@@ -31,7 +31,7 @@ var (
 	PairBTCTUSD = Pair((uint64(BTC.Code) << 32) | uint64(TUSD.Code))
 )
 
-// Pairs contains all the token pairs supported by renEx.
+// Pairs is a list of all supported token pairs.
 var Pairs = []Pair{
 	PairDAIBTC,
 	PairDAIETH,
@@ -42,17 +42,17 @@ var Pairs = []Pair{
 	PairBTCTUSD,
 }
 
-// BaseToken returns the base token of a token pair.
-func (pair Pair) BaseToken() (Token, error) {
+// BaseToken returns the base token for a given pair.
+func (pair Pair) BaseToken() Token {
 	return ParseTokenCode(Code(pair >> 32))
 }
 
-// QuoteToken returns the quote token of a token pair.
-func (pair Pair) QuoteToken() (Token, error) {
+// QuoteToken returns the quote token for a given pair.
+func (pair Pair) QuoteToken() Token {
 	return ParseTokenCode(Code(pair & 0x00000000FFFFFFFF))
 }
 
-// String returns a human-readable representation of Pair.
+// String returns a human-readable representation for a given pair.
 func (pair Pair) String() string {
 	switch pair {
 	case PairDAIBTC:
@@ -74,7 +74,8 @@ func (pair Pair) String() string {
 	}
 }
 
-// ParsePair parse the given string into a token pair we support.
+// ParsePair parses the given string into a token pair. It returns
+// `ErrInvalidTokenPair` if the pair is invalid.
 func ParsePair(pair string) (Pair, error) {
 	pair = strings.ToUpper(strings.TrimSpace(pair))
 	switch pair {

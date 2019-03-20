@@ -7,10 +7,11 @@ import (
 	"strings"
 )
 
-// ErrUnsupportedTokenPair is returned when the given token pair is unsupported.
+// ErrUnsupportedTokenPair is returned when the given token pair is not
+// supported.
 var ErrUnsupportedTokenPair = errors.New("unsupported token pair")
 
-// Name is a string representation of the token supported by Ren.
+// Name is a string representation of a token.
 type Name string
 
 var (
@@ -26,18 +27,22 @@ var (
 	NameGUSD = Name("GUSD")
 	NameTUSD = Name("TUSD")
 	NameWBTC = Name("WBTC")
+
+	NameInvalid = Name("INVALID")
 )
 
-// Code is a numerical representation of a token supported by RenEx.
+// Code is a numerical representation of a token.
 type Code uint32
 
 var (
-	// Base tokens are ranging from 0 to 1023. Base tokens can be a quote
-	// token in a Pair if the other base token has a higher token rank.
+	CodeInvalid Code = 0
+
+	// Base tokens range from 1 to 1023. Base tokens can be used as a quote
+	// token in a Pair if the other base token has a lower token code.
 	CodeDAI Code = 100
 	CodeBTC Code = 200
 
-	// Quote tokens are ranging from 1024 to Max_Uint32
+	// Quote tokens range from 1024 to Max_Uint32.
 	CodeETH  Code = 1024
 	CodeREN  Code = 1025
 	CodeDGX  Code = 1026
@@ -50,13 +55,15 @@ var (
 	CodeWBTC Code = 1033
 )
 
-// Token represents the token we are trading.
+// Token provides a token representation.
 type Token struct {
 	Name       Name           `json:"name"`
 	Code       Code           `json:"code"`
 	Decimals   int64          `json:"decimals"`
 	Blockchain BlockchainName `json:"blockchain"`
 }
+
+var InvalidToken = Token{NameInvalid, CodeInvalid, 0, ""}
 
 var (
 	DAI  = Token{NameDAI, CodeDAI, 18, ERC20}
@@ -84,73 +91,73 @@ func (token Token) String() string {
 }
 
 // Generate implements the `Generator` interface used by quickCheck.
-func (Token) Generate(rand *rand.Rand, size int) reflect.Value {
+func (token Token) Generate(rand *rand.Rand, size int) reflect.Value {
 	return reflect.ValueOf(SupportedTokens[rand.Int()%len(SupportedTokens)])
 }
 
-// ParseToken parses a string to a Token. It returns `ErrUnsupportedTokenPair`
-// if the given string cannot be parsed to a supported token.
-func ParseToken(token string) (Token, error) {
+// ParseToken parses a string to a token. It returns an `InvalidToken` if the
+// given string cannot be parsed to a token.
+func ParseToken(token string) Token {
 	token = strings.TrimSpace(strings.ToLower(token))
 	switch token {
 	case "dai", "maker-dai", "makerdai":
-		return DAI, nil
+		return DAI
 	case "bitcoin", "btc", "xbt":
-		return BTC, nil
+		return BTC
 	case "ethereum", "eth", "ether":
-		return ETH, nil
+		return ETH
 	case "ren", "republictoken", "republic token":
-		return REN, nil
+		return REN
 	case "digix-gold-token", "dgx", "dgt":
-		return DGX, nil
+		return DGX
 	case "zerox", "zrx", "0x":
-		return ZRX, nil
+		return ZRX
 	case "omisego", "omg", "omise-go":
-		return OMG, nil
+		return OMG
 	case "pax", "paxosstandardtoken", "paxos-standard-token":
-		return PAX, nil
+		return PAX
 	case "gusd", "gemini-dollar", "geminidollar":
-		return GUSD, nil
+		return GUSD
 	case "tusd", "trueusd", "true-usd":
-		return TUSD, nil
+		return TUSD
 	case "usdc", "usd-coin", "usdcoin":
-		return USDC, nil
+		return USDC
 	case "wrappedbtc", "wbtc", "wrappedbitcoin":
-		return WBTC, nil
+		return WBTC
 	default:
-		return Token{}, ErrUnsupportedTokenPair
+		return InvalidToken
 	}
 }
 
-// ParseTokenCode parses a token Code to a Token. It returns `ErrUnsupportedTokenPair`
-// if the given code cannot be parsed to a supported token.
-func ParseTokenCode(code Code) (Token, error) {
+// ParseTokenCode parses a token code to a token. It returns an `InvalidToken`
+// if the given code cannot be parsed to a token.
+func ParseTokenCode(code Code) Token {
 	switch code {
 	case CodeDAI:
-		return DAI, nil
+		return DAI
 	case CodeBTC:
-		return BTC, nil
+		return BTC
 	case CodeETH:
-		return ETH, nil
+		return ETH
 	case CodeREN:
-		return REN, nil
+		return REN
 	case CodeDGX:
-		return DGX, nil
+		return DGX
 	case CodeZRX:
-		return ZRX, nil
+		return ZRX
 	case CodeOMG:
-		return OMG, nil
+		return OMG
 	case CodePAX:
-		return PAX, nil
+		return PAX
 	case CodeGUSD:
-		return GUSD, nil
+		return GUSD
 	case CodeTUSD:
-		return TUSD, nil
+		return TUSD
 	case CodeUSDC:
-		return USDC, nil
+		return USDC
 	case CodeWBTC:
-		return WBTC, nil
+		return WBTC
 	default:
-		return Token{}, ErrUnsupportedTokenPair
+		return InvalidToken
 	}
 }
