@@ -2,6 +2,7 @@ package tokens
 
 import (
 	"errors"
+	"math/big"
 	"math/rand"
 	"reflect"
 	"strings"
@@ -93,6 +94,19 @@ func (token Token) String() string {
 // Generate implements the `Generator` interface used by quickCheck.
 func (token Token) Generate(rand *rand.Rand, size int) reflect.Value {
 	return reflect.ValueOf(SupportedTokens[rand.Int()%len(SupportedTokens)])
+}
+
+func (token Token) AdditionalTransactionFee(amount *big.Int) *big.Int {
+	switch token {
+	case DGX:
+		return calculateFeesFromBips(amount, 13)
+	default:
+		return nil
+	}
+}
+
+func calculateFeesFromBips(value *big.Int, bips int64) *big.Int {
+	return new(big.Int).Div(new(big.Int).Mul(value, big.NewInt(bips)), new(big.Int).Sub(big.NewInt(10000), big.NewInt(bips)))
 }
 
 // ParseToken parses a string to a token. It returns an `InvalidToken` if the
