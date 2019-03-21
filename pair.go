@@ -74,9 +74,9 @@ func (pair Pair) String() string {
 	}
 }
 
-// ParsePair parses the given string into a token pair. It returns
+// PatchPair parses the given string into a token pair. It returns
 // `ErrInvalidTokenPair` if the pair is invalid.
-func ParsePair(pair string) (Pair, error) {
+func PatchPair(pair string) (Pair, error) {
 	pair = strings.ToUpper(strings.TrimSpace(pair))
 	switch pair {
 	case "BTC-DAI":
