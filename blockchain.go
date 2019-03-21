@@ -13,6 +13,7 @@ type BlockchainName string
 
 var (
 	BITCOIN  = BlockchainName("bitcoin")
+	ZCASH    = BlockchainName("zcash")
 	ETHEREUM = BlockchainName("ethereum")
 	ERC20    = BlockchainName("erc20")
 )
