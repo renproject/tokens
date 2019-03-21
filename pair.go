@@ -56,19 +56,19 @@ func (pair Pair) QuoteToken() Token {
 func (pair Pair) String() string {
 	switch pair {
 	case PairDAIBTC:
-		return "DAI-BTC"
+		return "BTC-DAI"
 	case PairDAIETH:
-		return "DAI-ETH"
+		return "ETH-DAI"
 	case PairDAIREN:
-		return "DAI-REN"
+		return "REN-DAI"
 	case PairDAITUSD:
-		return "DAI-TUSD"
+		return "TUSD-DAI"
 	case PairBTCETH:
-		return "BTC-ETH"
+		return "ETH-BTC"
 	case PairBTCREN:
-		return "BTC-REN"
+		return "REN-BTC"
 	case PairBTCTUSD:
-		return "BTC-TUSD"
+		return "TUSD-BTC"
 	default:
 		return ErrInvalidTokenPair.Error()
 	}
@@ -79,19 +79,19 @@ func (pair Pair) String() string {
 func ParsePair(pair string) (Pair, error) {
 	pair = strings.ToUpper(strings.TrimSpace(pair))
 	switch pair {
-	case "DAI-BTC":
+	case "BTC-DAI":
 		return PairDAIBTC, nil
-	case "DAI-ETH":
+	case "ETH-DAI":
 		return PairDAIETH, nil
-	case "DAI-REN":
+	case "REN-DAI":
 		return PairDAIREN, nil
-	case "DAI-TUSD":
+	case "TUSD-DAI":
 		return PairDAITUSD, nil
-	case "BTC-ETH":
+	case "ETH-BTC":
 		return PairBTCETH, nil
-	case "BTC-REN":
+	case "REN-BTC":
 		return PairBTCREN, nil
-	case "BTC-TUSD":
+	case "TUSD-BTC":
 		return PairBTCTUSD, nil
 	default:
 		return 0, ErrInvalidTokenPair
