@@ -22,10 +22,12 @@ func NewPair(send, receive Token) Pair {
 // Pair values.
 var (
 	PairBTCDAI  = Pair((uint64(BTC.Code) << 32) | uint64(DAI.Code))
+	PairZECDAI  = Pair((uint64(ZEC.Code) << 32) | uint64(DAI.Code))
 	PairETHDAI  = Pair((uint64(ETH.Code) << 32) | uint64(DAI.Code))
 	PairRENDAI  = Pair((uint64(REN.Code) << 32) | uint64(DAI.Code))
 	PairTUSDDAI = Pair((uint64(TUSD.Code) << 32) | uint64(DAI.Code))
 
+	PairZECBTC  = Pair((uint64(ZEC.Code) << 32) | uint64(BTC.Code))
 	PairETHBTC  = Pair((uint64(ETH.Code) << 32) | uint64(BTC.Code))
 	PairRENBTC  = Pair((uint64(REN.Code) << 32) | uint64(BTC.Code))
 	PairTUSDBTC = Pair((uint64(TUSD.Code) << 32) | uint64(BTC.Code))
@@ -34,9 +36,11 @@ var (
 // Pairs is a list of all supported token pairs.
 var Pairs = []Pair{
 	PairBTCDAI,
+	PairZECDAI,
 	PairETHDAI,
 	PairRENDAI,
 	PairTUSDDAI,
+	PairZECBTC,
 	PairETHBTC,
 	PairRENBTC,
 	PairTUSDBTC,
@@ -57,12 +61,16 @@ func (pair Pair) String() string {
 	switch pair {
 	case PairBTCDAI:
 		return "BTC-DAI"
+	case PairZECDAI:
+		return "ZEC-DAI"
 	case PairETHDAI:
 		return "ETH-DAI"
 	case PairRENDAI:
 		return "REN-DAI"
 	case PairTUSDDAI:
 		return "TUSD-DAI"
+	case PairZECBTC:
+		return "ZEC-BTC"
 	case PairETHBTC:
 		return "ETH-BTC"
 	case PairRENBTC:
@@ -81,12 +89,16 @@ func PatchPair(pair string) (Pair, error) {
 	switch pair {
 	case "BTC-DAI":
 		return PairBTCDAI, nil
+	case "ZEC-DAI":
+		return PairZECDAI, nil
 	case "ETH-DAI":
 		return PairETHDAI, nil
 	case "REN-DAI":
 		return PairRENDAI, nil
 	case "TUSD-DAI":
 		return PairTUSDDAI, nil
+	case "ZEC-BTC":
+		return PairZECBTC, nil
 	case "ETH-BTC":
 		return PairETHBTC, nil
 	case "REN-BTC":
