@@ -44,12 +44,12 @@ var Pairs = []Pair{
 
 // QuoteToken returns the base token for a given pair.
 func (pair Pair) QuoteToken() Token {
-	return ParseTokenCode(Code(pair >> 32))
+	return ParseToken(Code(pair & 0x00000000FFFFFFFF))
 }
 
 // BaseToken returns the quote token for a given pair.
 func (pair Pair) BaseToken() Token {
-	return ParseTokenCode(Code(pair & 0x00000000FFFFFFFF))
+	return ParseToken(Code(pair >> 32))
 }
 
 // String returns a human-readable representation for a given pair.
@@ -70,7 +70,7 @@ func (pair Pair) String() string {
 	case PairTUSDBTC:
 		return "TUSD-BTC"
 	default:
-		return ErrInvalidTokenPair.Error()
+		panic(ErrInvalidTokenPair.Error())
 	}
 }
 

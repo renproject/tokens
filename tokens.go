@@ -15,8 +15,20 @@ var ErrUnsupportedTokenPair = errors.New("unsupported token pair")
 
 // NewErrUnsupportedToken returns an error when the given token is not
 // supported by Ren.
-func NewErrUnsupportedToken(token Name) error {
+func NewErrUnsupportedToken(token string) error {
 	return fmt.Errorf("unsupported token: %s", token)
+}
+
+// NewErrUnsupportedTokenCode returns an error when the given token is not
+// supported by Ren.
+func NewErrUnsupportedTokenCode(code Code) error {
+	return fmt.Errorf("unsupported token code: %d", code)
+}
+
+// NewErrUnsupportedTokenType returns an error when the given token type is not
+// supported by Ren.
+func NewErrUnsupportedTokenType(token interface{}) error {
+	return fmt.Errorf("unsupported token type: %T", token)
 }
 
 // Name is a string representation of a token.
@@ -24,6 +36,7 @@ type Name string
 
 var (
 	NameDAI  = Name("DAI")
+	NameZEC  = Name("ZEC")
 	NameBTC  = Name("BTC")
 	NameETH  = Name("ETH")
 	NameREN  = Name("REN")
@@ -35,8 +48,6 @@ var (
 	NameGUSD = Name("GUSD")
 	NameTUSD = Name("TUSD")
 	NameWBTC = Name("WBTC")
-
-	NameInvalid = Name("INVALID")
 )
 
 // Code is a numerical representation of a token.
@@ -49,6 +60,7 @@ var (
 	// token in a Pair if the other quote token has a lower token code.
 	CodeDAI Code = 100
 	CodeBTC Code = 200
+	CodeZEC Code = 201
 
 	// Base tokens range from 1024 to Max_Uint32.
 	CodeETH  Code = 1024
@@ -71,11 +83,10 @@ type Token struct {
 	Blockchain BlockchainName `json:"blockchain"`
 }
 
-var InvalidToken = Token{NameInvalid, CodeInvalid, 0, ""}
-
 var (
 	DAI  = Token{NameDAI, CodeDAI, 18, ERC20}
 	BTC  = Token{NameBTC, CodeBTC, 8, BITCOIN}
+	ZEC  = Token{NameZEC, CodeZEC, 8, ZCASH}
 	ETH  = Token{NameETH, CodeETH, 18, ETHEREUM}
 	REN  = Token{NameREN, CodeREN, 18, ERC20}
 	DGX  = Token{NameDGX, CodeDGX, 9, ERC20}
@@ -90,7 +101,7 @@ var (
 
 // SupportedTokens contains all the tokens supported by Ren.
 var SupportedTokens = []Token{
-	DAI, BTC, ETH, REN, DGX, ZRX, PAX, OMG, GUSD, TUSD, USDC, WBTC,
+	DAI, BTC, ZEC, ETH, REN, DGX, ZRX, PAX, OMG, GUSD, TUSD, USDC, WBTC,
 }
 
 // String returns the string representation of the token.
@@ -116,69 +127,96 @@ func calculateFeesFromBips(value *big.Int, bips int64) *big.Int {
 	return new(big.Int).Div(new(big.Int).Mul(value, big.NewInt(bips)), new(big.Int).Sub(big.NewInt(10000), big.NewInt(bips)))
 }
 
-// ParseToken parses a string to a token. It returns an `InvalidToken` if the
-// given string cannot be parsed to a token.
-func ParseToken(token string) Token {
-	token = strings.TrimSpace(strings.ToLower(token))
-	switch token {
-	case "dai", "maker-dai", "makerdai":
-		return DAI
-	case "bitcoin", "btc", "xbt":
-		return BTC
-	case "ethereum", "eth", "ether":
-		return ETH
-	case "ren", "republictoken", "republic token":
-		return REN
-	case "digix-gold-token", "dgx", "dgt":
-		return DGX
-	case "zerox", "zrx", "0x":
-		return ZRX
-	case "omisego", "omg", "omise-go":
-		return OMG
-	case "pax", "paxosstandardtoken", "paxos-standard-token":
-		return PAX
-	case "gusd", "gemini-dollar", "geminidollar":
-		return GUSD
-	case "tusd", "trueusd", "true-usd":
-		return TUSD
-	case "usdc", "usd-coin", "usdcoin":
-		return USDC
-	case "wrappedbtc", "wbtc", "wrappedbitcoin":
-		return WBTC
+// ParseToken parses a string to a token. It panics if the string is not a valid
+// token.
+func ParseToken(token interface{}) Token {
+	t, err := PatchToken(token)
+	if err != nil {
+		panic(err)
+	}
+	return t
+}
+
+// PatchToken tries to covert a string to a token. If it cannot, returns an
+// error.
+func PatchToken(token interface{}) (Token, error) {
+	switch token := token.(type) {
+	case string:
+		return patchTokenFromString(token)
+	case Name:
+		return patchTokenFromString(string(token))
+	case uint32:
+		return patchTokenFromCode(Code(token))
+	case Code:
+		return patchTokenFromCode(token)
 	default:
-		return InvalidToken
+		return Token{}, NewErrUnsupportedTokenType(token)
 	}
 }
 
-// ParseTokenCode parses a token code to a token. It returns an `InvalidToken`
-// if the given code cannot be parsed to a token.
-func ParseTokenCode(code Code) Token {
+func patchTokenFromString(token string) (Token, error) {
+	token = strings.TrimSpace(strings.ToLower(token))
+	switch token {
+	case "dai", "maker-dai", "makerdai":
+		return DAI, nil
+	case "bitcoin", "btc", "xbt":
+		return BTC, nil
+	case "zec", "zcash":
+		return ZEC, nil
+	case "ethereum", "eth", "ether":
+		return ETH, nil
+	case "ren", "republictoken", "republic token":
+		return REN, nil
+	case "digix-gold-token", "dgx", "dgt":
+		return DGX, nil
+	case "zerox", "zrx", "0x":
+		return ZRX, nil
+	case "omisego", "omg", "omise-go":
+		return OMG, nil
+	case "pax", "paxosstandardtoken", "paxos-standard-token":
+		return PAX, nil
+	case "gusd", "gemini-dollar", "geminidollar":
+		return GUSD, nil
+	case "tusd", "trueusd", "true-usd":
+		return TUSD, nil
+	case "usdc", "usd-coin", "usdcoin":
+		return USDC, nil
+	case "wrappedbtc", "wbtc", "wrappedbitcoin":
+		return WBTC, nil
+	default:
+		return Token{}, NewErrUnsupportedToken(token)
+	}
+}
+
+func patchTokenFromCode(code Code) (Token, error) {
 	switch code {
 	case CodeDAI:
-		return DAI
+		return DAI, nil
 	case CodeBTC:
-		return BTC
+		return BTC, nil
+	case CodeZEC:
+		return ZEC, nil
 	case CodeETH:
-		return ETH
+		return ETH, nil
 	case CodeREN:
-		return REN
+		return REN, nil
 	case CodeDGX:
-		return DGX
+		return DGX, nil
 	case CodeZRX:
-		return ZRX
+		return ZRX, nil
 	case CodeOMG:
-		return OMG
+		return OMG, nil
 	case CodePAX:
-		return PAX
+		return PAX, nil
 	case CodeGUSD:
-		return GUSD
+		return GUSD, nil
 	case CodeTUSD:
-		return TUSD
+		return TUSD, nil
 	case CodeUSDC:
-		return USDC
+		return USDC, nil
 	case CodeWBTC:
-		return WBTC
+		return WBTC, nil
 	default:
-		return InvalidToken
+		return Token{}, NewErrUnsupportedTokenCode(code)
 	}
 }
