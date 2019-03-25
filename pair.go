@@ -13,7 +13,7 @@ type Pair uint64
 
 // NewPair creates a new pair from the given tokens.
 func NewPair(send, receive Token) Pair {
-	if send.Code < receive.Code {
+	if send.Code > receive.Code {
 		return Pair((uint64(send.Code) << 32) | uint64(receive.Code))
 	}
 	return Pair((uint64(receive.Code) << 32) | uint64(send.Code))
@@ -21,53 +21,53 @@ func NewPair(send, receive Token) Pair {
 
 // Pair values.
 var (
-	PairDAIBTC  = Pair((uint64(DAI.Code) << 32) | uint64(BTC.Code))
-	PairDAIETH  = Pair((uint64(DAI.Code) << 32) | uint64(ETH.Code))
-	PairDAIREN  = Pair((uint64(DAI.Code) << 32) | uint64(REN.Code))
-	PairDAITUSD = Pair((uint64(DAI.Code) << 32) | uint64(TUSD.Code))
+	PairBTCDAI  = Pair((uint64(BTC.Code) << 32) | uint64(DAI.Code))
+	PairETHDAI  = Pair((uint64(ETH.Code) << 32) | uint64(DAI.Code))
+	PairRENDAI  = Pair((uint64(REN.Code) << 32) | uint64(DAI.Code))
+	PairTUSDDAI = Pair((uint64(TUSD.Code) << 32) | uint64(DAI.Code))
 
-	PairBTCETH  = Pair((uint64(BTC.Code) << 32) | uint64(ETH.Code))
-	PairBTCREN  = Pair((uint64(BTC.Code) << 32) | uint64(REN.Code))
-	PairBTCTUSD = Pair((uint64(BTC.Code) << 32) | uint64(TUSD.Code))
+	PairETHBTC  = Pair((uint64(ETH.Code) << 32) | uint64(BTC.Code))
+	PairRENBTC  = Pair((uint64(REN.Code) << 32) | uint64(BTC.Code))
+	PairTUSDBTC = Pair((uint64(TUSD.Code) << 32) | uint64(BTC.Code))
 )
 
 // Pairs is a list of all supported token pairs.
 var Pairs = []Pair{
-	PairDAIBTC,
-	PairDAIETH,
-	PairDAIREN,
-	PairDAITUSD,
-	PairBTCETH,
-	PairBTCREN,
-	PairBTCTUSD,
+	PairBTCDAI,
+	PairETHDAI,
+	PairRENDAI,
+	PairTUSDDAI,
+	PairETHBTC,
+	PairRENBTC,
+	PairTUSDBTC,
 }
 
-// BaseToken returns the base token for a given pair.
-func (pair Pair) BaseToken() Token {
-	return ParseToken(Code(pair >> 32))
-}
-
-// QuoteToken returns the quote token for a given pair.
+// QuoteToken returns the base token for a given pair.
 func (pair Pair) QuoteToken() Token {
 	return ParseToken(Code(pair & 0x00000000FFFFFFFF))
+}
+
+// BaseToken returns the quote token for a given pair.
+func (pair Pair) BaseToken() Token {
+	return ParseToken(Code(pair >> 32))
 }
 
 // String returns a human-readable representation for a given pair.
 func (pair Pair) String() string {
 	switch pair {
-	case PairDAIBTC:
+	case PairBTCDAI:
 		return "BTC-DAI"
-	case PairDAIETH:
+	case PairETHDAI:
 		return "ETH-DAI"
-	case PairDAIREN:
+	case PairRENDAI:
 		return "REN-DAI"
-	case PairDAITUSD:
+	case PairTUSDDAI:
 		return "TUSD-DAI"
-	case PairBTCETH:
+	case PairETHBTC:
 		return "ETH-BTC"
-	case PairBTCREN:
+	case PairRENBTC:
 		return "REN-BTC"
-	case PairBTCTUSD:
+	case PairTUSDBTC:
 		return "TUSD-BTC"
 	default:
 		panic(ErrInvalidTokenPair.Error())
@@ -80,19 +80,19 @@ func PatchPair(pair string) (Pair, error) {
 	pair = strings.ToUpper(strings.TrimSpace(pair))
 	switch pair {
 	case "BTC-DAI":
-		return PairDAIBTC, nil
+		return PairBTCDAI, nil
 	case "ETH-DAI":
-		return PairDAIETH, nil
+		return PairETHDAI, nil
 	case "REN-DAI":
-		return PairDAIREN, nil
+		return PairRENDAI, nil
 	case "TUSD-DAI":
-		return PairDAITUSD, nil
+		return PairTUSDDAI, nil
 	case "ETH-BTC":
-		return PairBTCETH, nil
+		return PairETHBTC, nil
 	case "REN-BTC":
-		return PairBTCREN, nil
+		return PairRENBTC, nil
 	case "TUSD-BTC":
-		return PairBTCTUSD, nil
+		return PairTUSDBTC, nil
 	default:
 		return 0, ErrInvalidTokenPair
 	}

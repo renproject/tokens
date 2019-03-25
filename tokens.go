@@ -54,13 +54,15 @@ var (
 type Code uint32
 
 var (
-	// Base tokens range from 1 to 1023. Base tokens can be used as a quote
-	// token in a Pair if the other base token has a lower token code.
+	CodeInvalid Code = 0
+
+	// Quote tokens range from 1 to 1023. Quote tokens can be used as a quote
+	// token in a Pair if the other quote token has a lower token code.
 	CodeDAI Code = 100
 	CodeBTC Code = 200
 	CodeZEC Code = 201
 
-	// Quote tokens range from 1024 to Max_Uint32.
+	// Base tokens range from 1024 to Max_Uint32.
 	CodeETH  Code = 1024
 	CodeREN  Code = 1025
 	CodeDGX  Code = 1026
