@@ -13,7 +13,7 @@ type Pair uint64
 
 // NewPair creates a new pair from the given tokens.
 func NewPair(send, receive Token) Pair {
-	if send.Code < receive.Code {
+	if send.Code > receive.Code {
 		return Pair((uint64(send.Code) << 32) | uint64(receive.Code))
 	}
 	return Pair((uint64(receive.Code) << 32) | uint64(send.Code))
